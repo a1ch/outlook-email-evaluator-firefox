@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 340px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      background: #fff;
+    }
+    .header {
+      background: #0078d4;
+      color: white;
+      padding: 14px 16px;
+    }
+    .header h1 { font-size: 15px; font-weight: 600; }
+    .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    .tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab.active {
+      color: #0078d4;
+      border-bottom-color: #0078d4;
+    }
+
+    .panel { display: none; padding: 14px; }
+    .panel.active { display: block; }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .hint {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .hint a { color: #0078d4; text-decoration: none; }
+
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 10px;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    input:focus, textarea:focus { border-color: #0078d4; }
+
+    .field { margin-bottom: 4px; }
+
+    button.save-btn {
+      width: 100%;
+      padding: 8px;
+      background: #0078d4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    button.save-btn:hover { background: #106ebe; }
+
+    .show-toggle {
+      background: none;
+      color: #0078d4;
+      border: none;
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    #status {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+    #status.success { background: #e6f4ea; color: #1e7e34; display: block; }
+    #status.error { background: #fff0f0; color: #cc0000; display: block; }
+
+    .how-to { font-size: 12px; color: #444; line-height: 1.8; }
+    .how-to li { margin-left: 16px; }
+    .how-to b { color: #0078d4; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📧 Email Evaluator</h1>
+    <p>Spam & phishing detection for Outlook</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="api">API Key</button>
+    <button class="tab" data-tab="settings">Settings</button>
+    <button class="tab" data-tab="help">Help</button>
+  </div>
+
+  <!-- API Key Tab -->
+  <div class="panel active" id="tab-api">
+    <div class="field">
+      <label for="apiKey">Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-..." />
+      <button class="show-toggle" id="toggleShow">Show key</button>
+      <p class="hint">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    </div>
+    <button class="save-btn" id="saveBtn">Save API Key</button>
+    <div id="status"></div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="panel" id="tab-settings">
+    <div class="field">
+      <label for="tenantDomain">Your Organization Domain</label>
+      <input type="text" id="tenantDomain" placeholder="e.g. lastspikebrewery.com" />
+      <p class="hint">Used to detect external senders. Emails from outside this domain will be flagged as external.</p>
+    </div>
+
+    <div class="field">
+      <label for="customPrompt">Additional Instructions</label>
+      <textarea id="customPrompt" rows="3" placeholder="e.g. We frequently receive emails from AWS, flag any crypto-related content..."></textarea>
+      <p class="hint">Extra context given to the AI on every analysis. No redeploy needed.</p>
+    </div>
+
+    <button class="save-btn" id="saveSettings">Save Settings</button>
+    <div id="settingsStatus"></div>
+  </div>
+
+  <!-- Help Tab -->
+  <div class="panel" id="tab-help">
+    <ul class="how-to">
+      <li>Open <b>outlook.cloud.microsoft</b> in Chrome</li>
+      <li>Click or select an email</li>
+      <li>Use the sidebar on the right</li>
+      <li>Click <b>Analyze Email</b></li>
+      <li>Results show verdict, scores, and reasons</li>
+    </ul>
+    <br>
+    <p class="hint">Tip: Set your organization domain in <b>Settings</b> so external senders are correctly identified.</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
