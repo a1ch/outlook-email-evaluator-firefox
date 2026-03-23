@@ -1,0 +1,39 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================
+; Outlook Email Evaluator - Chrome Enterprise Deployment
+; Extension ID: lhjmmcekoedomfkllmlfkpnfelkljigj
+; ============================================================
+; 
+; BEFORE APPLYING:
+; Replace https://YOUR_SERVER/extensions/ with your actual hosting URL
+; e.g. https://intranet.yourcompany.com/extensions/
+;      or https://yourblobstorage.blob.core.windows.net/extensions/
+;
+; FILES TO HOST ON YOUR SERVER:
+;   - outlook-email-evaluator.crx
+;   - update.xml
+;
+; HOW TO DEPLOY:
+; Option A - Registry (run on each machine or push via GPO):
+;   Double-click this .reg file or push via GPO Preferences
+;
+; Option B - GPO Administrative Templates:
+;   1. Install Chrome ADMX templates on your domain controller
+;      https://chromeenterprise.google/browser/download/
+;   2. GPO path: Computer Config > Admin Templates > Google Chrome > Extensions
+;   3. Enable "Configure the list of force-installed extensions"
+;   4. Add value: lhjmmcekoedomfkllmlfkpnfelkljigj;https://YOUR_SERVER/extensions/update.xml
+;
+; Option C - Intune:
+;   1. Devices > Configuration Profiles > Create > Settings Catalog
+;   2. Search "force-installed extensions" under Google Chrome
+;   3. Add: lhjmmcekoedomfkllmlfkpnfelkljigj;https://YOUR_SERVER/extensions/update.xml
+; ============================================================
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome\ExtensionInstallForcelist]
+"1"="lhjmmcekoedomfkllmlfkpnfelkljigj;https://YOUR_SERVER/extensions/update.xml"
+
+; Also works for Edge (Chromium-based):
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist]
+"1"="lhjmmcekoedomfkllmlfkpnfelkljigj;https://YOUR_SERVER/extensions/update.xml"
