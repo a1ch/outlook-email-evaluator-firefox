@@ -1,4 +1,4 @@
-// Outlook Email Evaluator - Content Script
+﻿// Outlook Email Evaluator - Content Script
 let sidebar = null;
 let lastEmailId = null;
 let observer = null;
@@ -385,7 +385,8 @@ async function analyzeCurrentEmail() {
     highRiskFiles: email.highRiskFiles,
     suspiciousFiles: email.suspiciousFiles,
     isOutlookExternal: isOutlookExternal,
-    clientTimestamp: new Date().toISOString()
+    clientTimestamp: new Date().toISOString(),
+    clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
   };
 
   try {
