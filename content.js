@@ -71,8 +71,10 @@ function createSidebar() {
     <div id="oe-panel">
       <div id="oe-header">
         <span>📧 Email Evaluator</span>
-        <button id="oe-close">&#x27E9;</button>
-      </div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <button id="oe-dark-toggle" title="Toggle dark mode">🌙</button>
+          <button id="oe-close">&#x27E9;</button>
+        </div>
       <div id="oe-body"><p>Select or open an email to analyze it.</p></div>
       <button id="oe-analyze-btn">🔍 Analyze Email</button>
     </div>
@@ -81,6 +83,19 @@ function createSidebar() {
 
   document.getElementById('oe-close').addEventListener('click', () => {
     sidebar.classList.add('oe-collapsed');
+  });
+
+  // Dark mode - restore saved preference
+  try {
+    if (localStorage.getItem('oe-dark-mode') === 'true') {
+      sidebar.classList.add('oe-dark');
+      document.getElementById('oe-dark-toggle').textContent = '☀️';
+    }
+  } catch(e) {}
+  document.getElementById('oe-dark-toggle').addEventListener('click', () => {
+    const isDark = sidebar.classList.toggle('oe-dark');
+    document.getElementById('oe-dark-toggle').textContent = isDark ? '☀️' : '🌙';
+    try { localStorage.setItem('oe-dark-mode', isDark ? 'true' : 'false'); } catch(e) {}
   });
   document.getElementById('oe-tab').addEventListener('click', () => {
     sidebar.classList.remove('oe-collapsed');
