@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Outlook Email Evaluator",
-  "version": "1.0",
+  "version": "2.0",
   "description": "AI-powered spam and phishing detection for Outlook Web using Claude AI",
   "browser_specific_settings": {
     "gecko": {
@@ -13,7 +13,9 @@
     "storage",
     "activeTab",
     "https://outlook.cloud.microsoft/*",
-    "https://api.anthropic.com/*"
+    "https://outlook.office.com/*",
+    "https://outlook.office365.com/*",
+    "https://*.supabase.co/*"
   ],
   "background": {
     "scripts": ["background.js"],
@@ -21,7 +23,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://outlook.cloud.microsoft/*"],
+      "matches": [
+        "https://outlook.cloud.microsoft/*",
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*"
+      ],
       "js": ["content.js"],
       "css": ["sidebar.css", "warning.css"]
     }

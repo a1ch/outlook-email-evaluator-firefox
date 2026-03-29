@@ -1,68 +1,107 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('Outlook Email Evaluator installed.');
-});
+// Firefox - background.js v2.0
+// Uses Supabase proxy instead of direct Anthropic API call
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browser.runtime.onInstalled.addListener(() => {
+  console.log('Outlook Email Evaluator installed.')
+})
+
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message.type === 'PING') {
+    return Promise.resolve(true)
+  }
+
   if (message.type === 'ANALYZE_EMAIL') {
-    chrome.storage.local.get(['apiKey', 'tenantDomain', 'customPrompt'], async (result) => {
-      const apiKey = result.apiKey;
-      const tenantDomain = result.tenantDomain || '';
-      const customPrompt = result.customPrompt || '';
+    const tabId = sender.tab?.id
+    if (!tabId) return false
 
-      const customPromptLine = customPrompt ? '- Additional instructions: ' + customPrompt : '';
-      let prompt = message.prompt
-        .replaceAll('__TENANT_DOMAIN__', tenantDomain || 'unknown')
-        .replace('__CUSTOM_PROMPT__', customPromptLine);
+    return browser.storage.local.get(['proxyUrl', 'extensionToken', 'customPrompt', 'tenantDomain']).then(async (result) => {
+      const proxyUrl    = (result.proxyUrl || '').trim()
+      const extToken    = (result.extensionToken || '').trim()
+      const customPrompt = result.customPrompt || ''
+      const tenantDomain = (result.tenantDomain || '').trim()
 
-      console.log('ANALYZE_EMAIL received');
-      console.log('API key found:', apiKey ? 'YES (length ' + apiKey.length + ')' : 'NO');
-
-      if (!apiKey) {
-        chrome.tabs.sendMessage(sender.tab.id, { type: 'ANALYSIS_DONE', error: 'No API key set. Click the extension icon to add your key.' });
-        return;
+      if (!proxyUrl) {
+        browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: 'No proxy URL set. Click the extension icon and add your Supabase proxy URL.' })
+        return
+      }
+      if (!isAllowedSupabaseFunctionUrl(proxyUrl, 'analyze-email')) {
+        browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: 'Invalid proxy URL. Use your Supabase HTTPS URL ending in /functions/v1/analyze-email' })
+        return
+      }
+      if (!extToken) {
+        browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: 'No extension token set. Click the extension icon and add your token.' })
+        return
       }
 
-      console.log('Making fetch to Anthropic...');
-
       try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
+        const response = await fetch(proxyUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
+            'x-extension-token': extToken,
           },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
+          body: JSON.stringify({ emailData: message.emailData, customPrompt, tenantDomain })
+        })
 
-        console.log('Response status:', response.status);
-
+        if (response.status === 429) {
+          browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: 'Please wait 5 seconds before analyzing another email.' })
+          return
+        }
         if (!response.ok) {
-          const err = await response.json();
-          console.log('API error:', JSON.stringify(err));
-          chrome.tabs.sendMessage(sender.tab.id, { type: 'ANALYSIS_DONE', error: 'API ' + response.status + ': ' + (err.error?.message || JSON.stringify(err)) });
-          return;
+          const err = await response.json().catch(() => ({}))
+          browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: `Proxy error ${response.status}: ${err.error || response.statusText}` })
+          return
         }
 
-        const data = await response.json();
-        console.log('Success! Parsing result...');
-        const text = data.content[0].text.trim();
-        const clean = text.replace(/```json|```/g, '').trim();
-        const parsed = JSON.parse(clean);
-
-        // Send result directly in the message - no storage needed
-        chrome.tabs.sendMessage(sender.tab.id, { type: 'ANALYSIS_DONE', result: parsed });
+        const data = await response.json()
+        browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', result: data.result })
 
       } catch (err) {
-        console.log('Fetch error:', err.message);
-        chrome.tabs.sendMessage(sender.tab.id, { type: 'ANALYSIS_DONE', error: 'Fetch failed: ' + err.message });
+        browser.tabs.sendMessage(tabId, { type: 'ANALYSIS_DONE', error: 'Request failed: ' + err.message })
       }
-    });
-    return true;
+    })
   }
-});
+
+  if (message.type === 'SUBMIT_FEEDBACK') {
+    const tabId = sender.tab?.id
+    if (!tabId) return false
+
+    return browser.storage.local.get(['proxyUrl', 'extensionToken']).then(async (result) => {
+      const proxyUrl = (result.proxyUrl || '').trim()
+      const extToken = (result.extensionToken || '').trim()
+
+      if (!proxyUrl || !extToken) {
+        browser.tabs.sendMessage(tabId, { type: 'FEEDBACK_RESULT', success: false, error: 'Extension not configured.' })
+        return
+      }
+
+      const feedbackUrl = proxyUrl.replace(/\/analyze-email\/?$/, '/report-feedback')
+      if (!isAllowedSupabaseFunctionUrl(feedbackUrl, 'report-feedback')) {
+        browser.tabs.sendMessage(tabId, { type: 'FEEDBACK_RESULT', success: false, error: 'Could not derive feedback URL.' })
+        return
+      }
+
+      try {
+        const response = await fetch(feedbackUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-extension-token': extToken,
+          },
+          body: JSON.stringify(message.payload)
+        })
+
+        if (response.ok) {
+          browser.tabs.sendMessage(tabId, { type: 'FEEDBACK_RESULT', success: true })
+        } else {
+          const err = await response.json().catch(() => ({}))
+          browser.tabs.sendMessage(tabId, { type: 'FEEDBACK_RESULT', success: false, error: err.error || `Error ${response.status}` })
+        }
+      } catch (err) {
+        browser.tabs.sendMessage(tabId, { type: 'FEEDBACK_RESULT', success: false, error: err.message })
+      }
+    })
+  }
+
+  return false
+})

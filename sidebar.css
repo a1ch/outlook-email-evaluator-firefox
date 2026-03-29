@@ -1,374 +1,220 @@
-/* Outlook Email Evaluator - Sidebar Styles */
-
-#oe-sidebar * {
-  user-select: text;
-  -webkit-user-select: text;
-}
-
+/* ── Sidebar wrapper ─────────────────────────────────────── */
 #oe-sidebar {
-  position: fixed;
-  top: 60px;
-  right: 0;
-  width: 300px;
-  height: calc(100vh - 60px);
-  background: #ffffff;
-  border-left: 1px solid #e0e0e0;
-  box-shadow: -4px 0 16px rgba(0,0,0,0.12);
-  z-index: 999999;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-size: 13px;
-  transition: transform 0.3s ease;
-  overflow: visible;
+  position: fixed; top: 0; right: 0; width: 340px; height: 100vh;
+  z-index: 999999; font-family: "Segoe UI", sans-serif; font-size: 13px;
+  display: flex; flex-direction: row; pointer-events: none;
+  transition: width 0.2s ease;
 }
 
-/* Clip inner content but not the tab */
-#oe-header, #oe-body, #oe-footer {
-  overflow: hidden;
-}
-
-#oe-body {
-  overflow-y: auto;
-}
-
-#oe-sidebar.oe-collapsed {
-  transform: translateX(300px);
-}
-
-#oe-sidebar.oe-collapsed #oe-tab {
-  display: flex;
-}
-
+/* ── Collapsed restore tab ───────────────────────────────── */
 #oe-tab {
-  display: none;
   position: absolute;
-  left: -32px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 80px;
+  top: 72px;
+  right: 0;
+  width: auto;
+  writing-mode: horizontal-tb;
   background: #0078d4;
-  border-radius: 6px 0 0 6px;
-  cursor: pointer;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  box-shadow: -2px 0 8px rgba(0,0,0,0.2);
-}
-
-#oe-tab span {
-  display: block;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
   color: white;
-  font-size: 11px;
+  padding: 7px 10px;
+  cursor: pointer;
+  pointer-events: all;
+  border-radius: 6px 0 0 6px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  display: none;               /* hidden when panel is open */
+  align-items: center;
+  gap: 6px;
+  box-shadow: -2px 2px 8px rgba(0,0,0,0.20);
+  white-space: nowrap;
   user-select: none;
 }
+#oe-tab:hover { background: #006cbe; }
 
-#oe-tab-icon {
-  color: white;
-  font-size: 14px;
-}
+/* Show tab only when sidebar is collapsed */
+.oe-collapsed #oe-tab { display: flex; }
 
-#oe-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  background: #0078d4;
-  color: white;
-  flex-shrink: 0;
-}
-
-#oe-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-#oe-close {
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 0 4px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-  line-height: 1;
-}
-
-#oe-close:hover {
-  opacity: 1;
-}
-
-.oe-collapsed #oe-close {
-  display: none;
-}
-
-#oe-body {
-  flex: 1;
-  padding: 14px;
-}
-
-#oe-footer {
-  padding: 10px 14px;
-  border-top: 1px solid #e8e8e8;
-  flex-shrink: 0;
-}
-
-#oe-analyze-btn {
-  width: 100%;
-  padding: 9px;
-  background: #0078d4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#oe-analyze-btn:hover {
-  background: #106ebe;
-}
-
-/* Idle state */
-#oe-idle p {
-  color: #666;
-  text-align: center;
-  margin-top: 20px;
-  line-height: 1.5;
-}
-
-.oe-email-subject {
-  font-weight: 600;
-  color: #333 !important;
-  font-size: 13px;
-  word-break: break-word;
-}
-
-.oe-hint {
-  font-size: 12px;
-  color: #888 !important;
-  margin-top: 6px !important;
-}
-
-/* Loading */
-#oe-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 0;
-  gap: 12px;
-  color: #555;
-}
-
-.oe-spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #e0e0e0;
-  border-top-color: #0078d4;
-  border-radius: 50%;
-  animation: oe-spin 0.8s linear infinite;
-}
-
-@keyframes oe-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Error */
-.oe-error {
-  background: #fff4f4;
-  border: 1px solid #ffcccc;
-  border-radius: 6px;
-  padding: 12px;
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  color: #c00;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-/* Result */
-.oe-result {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Verdict badge */
-.oe-verdict {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.oe-verdict-icon {
-  font-size: 24px;
-}
-
-.verdict-safe {
-  background: #e6f4ea;
-  color: #1e7e34;
-  border: 1px solid #a8d5b5;
-}
-
-.verdict-suspicious {
-  background: #fff8e1;
-  color: #b45309;
-  border: 1px solid #fcd34d;
-}
-
-.verdict-spam {
-  background: #fff0f0;
-  color: #cc0000;
-  border: 1px solid #ffb3b3;
-}
-
-.verdict-phishing {
-  background: #fdf0ff;
-  color: #7c3aed;
-  border: 1px solid #c4b5fd;
-}
-
-/* Score bars */
-.oe-scores {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.oe-score {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.oe-score label {
-  font-size: 11px;
-  color: #666;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.oe-score span {
-  font-size: 11px;
-  color: #444;
-  text-align: right;
-}
-
-.oe-bar-wrap {
-  height: 6px;
-  background: #f0f0f0;
-  border-radius: 3px;
+/* ── Main panel ──────────────────────────────────────────── */
+#oe-panel {
+  flex: 1; background: #f5f5f5; display: flex; flex-direction: column;
+  pointer-events: all; box-shadow: -4px 0 16px rgba(0,0,0,0.15);
   overflow: hidden;
 }
+.oe-collapsed #oe-panel { display: none; }
+.oe-collapsed { width: auto !important; }
 
-.oe-bar {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.6s ease;
+/* ── Header ──────────────────────────────────────────────── */
+#oe-header {
+  background: #0078d4; color: white; padding: 10px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-weight: 600; font-size: 14px; flex-shrink: 0;
 }
-
-.phishing-bar {
-  background: linear-gradient(90deg, #f59e0b, #dc2626);
+#oe-close {
+  background: none; border: none; color: white; cursor: pointer;
+  font-size: 18px; padding: 0 4px; line-height: 1;
 }
+#oe-close:hover { opacity: 0.7; }
 
-.spam-bar {
-  background: linear-gradient(90deg, #60a5fa, #7c3aed);
+/* ── Body & button ───────────────────────────────────────── */
+#oe-body {
+  flex: 1; overflow-y: auto; padding: 10px 12px;
 }
+#oe-analyze-btn {
+  margin: 8px 12px 12px; padding: 9px 0; background: #0078d4;
+  color: white; border: none; border-radius: 4px; font-size: 13px;
+  font-weight: 600; cursor: pointer; flex-shrink: 0;
+}
+#oe-analyze-btn:hover { background: #006cbe; }
+#oe-analyze-btn:disabled { background: #aaa; cursor: not-allowed; }
 
-/* Sections */
+/* ── Spinner ─────────────────────────────────────────────── */
+.oe-spinner {
+  width: 20px; height: 20px; border: 2px solid #ddd;
+  border-top-color: #0078d4; border-radius: 50%;
+  animation: oe-spin 0.8s linear infinite; margin: 0 auto 8px;
+}
+@keyframes oe-spin { to { transform: rotate(360deg); } }
+
+/* ── Verdict ─────────────────────────────────────────────── */
+.oe-verdict {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-radius: 8px; margin-bottom: 10px;
+  font-weight: 700; font-size: 15px;
+}
+.oe-verdict-icon { font-size: 20px; }
+.verdict-safe       { background: #dff6dd; color: #107c10; }
+.verdict-suspicious { background: #fff4ce; color: #8a6914; }
+.verdict-spam       { background: #fde7e9; color: #a80000; }
+.verdict-phishing   { background: #a80000; color: white; }
+
+/* ── Scores ──────────────────────────────────────────────── */
+.oe-scores {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+.oe-score {
+  flex: 1; background: white; border: 1px solid #eee;
+  border-radius: 6px; padding: 7px 10px; text-align: center;
+}
+.oe-score-label { display: block; font-size: 11px; color: #666; }
+.oe-score-val   { display: block; font-weight: 700; font-size: 14px; color: #333; }
+
+/* ── Sections ────────────────────────────────────────────── */
 .oe-section {
-  background: #f8f8f8;
-  border-radius: 6px;
-  padding: 10px 12px;
+  background: white; border: 1px solid #eee;
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;
+}
+.oe-section-title {
+  font-weight: 600; font-size: 11px; color: #0078d4;
+  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px;
+}
+.oe-section p { font-size: 12px; line-height: 1.5; color: #333; margin: 0; }
+
+/* ── Finding Cards ───────────────────────────────────────── */
+.oe-finding {
+  border: 1px solid #e0e0e0; border-radius: 6px;
+  margin-bottom: 6px; overflow: hidden; background: white;
+}
+.oe-finding-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px; cursor: pointer; user-select: none;
+  background: #fafafa; transition: background 0.15s;
+}
+.oe-finding-header:hover { background: #f0f0f0; }
+.oe-finding-icon { font-size: 14px; flex-shrink: 0; }
+.oe-finding-flag { flex: 1; font-size: 12px; font-weight: 600; color: #333; line-height: 1.3; }
+.oe-finding-toggle { font-size: 10px; color: #888; transition: transform 0.2s; flex-shrink: 0; }
+.oe-finding-open .oe-finding-toggle { transform: rotate(180deg); }
+.oe-finding-body {
+  display: none; padding: 10px 12px; border-top: 1px solid #eee;
+}
+.oe-finding-open .oe-finding-body { display: block; }
+.oe-finding-section { margin-bottom: 8px; }
+.oe-finding-section:last-child { margin-bottom: 0; }
+.oe-finding-label {
+  font-size: 11px; font-weight: 600; color: #666;
+  text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 4px;
+}
+.oe-finding-text { font-size: 12px; line-height: 1.5; color: #333; }
+.oe-tip { background: #f0f7ff; border-radius: 4px; padding: 8px 10px; }
+.oe-tip .oe-finding-label { color: #0078d4; }
+
+/* ── Lesson box ──────────────────────────────────────────── */
+.oe-lesson {
+  background: #fff8e1; border: 1px solid #f7c948;
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;
+}
+.oe-lesson-title {
+  font-weight: 600; font-size: 11px; color: #8a6914;
+  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px;
+}
+.oe-lesson-text { font-size: 12px; line-height: 1.5; color: #5a4000; font-weight: 500; }
+
+/* ── Warning banner ──────────────────────────────────────── */
+.oe-warning-banner {
+  background: #fff4ce; border: 1px solid #f7bd37;
+  border-radius: 6px; padding: 10px 12px;
+  font-size: 12px; color: #8a6914; line-height: 1.5; margin-bottom: 8px;
 }
 
-.oe-section h4 {
-  margin: 0 0 6px 0;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: #666;
-  font-weight: 600;
+/* ── Links ───────────────────────────────────────────────── */
+.oe-link {
+  font-size: 11px; padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.oe-link:last-child { border-bottom: none; }
+.oe-link-display { display: block; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oe-link-dest { display: block; color: #555; font-weight: 400; word-break: break-all; white-space: normal; line-height: 1.4; }
+.oe-link-dest a { color: #1a6eb5; text-decoration: none; }
+.oe-link-dest a:hover { text-decoration: underline; }
+.oe-link-mismatch .oe-link-dest { color: #a80000; font-weight: 700; }
+.oe-link-mismatch .oe-link-dest a { color: #a80000; }
+
+/* ── Feedback section ────────────────────────────────────── */
+.oe-feedback-section {
+  background: #f9f9f9; border: 1px solid #e0e0e0;
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;
+}
+.oe-feedback-title {
+  font-size: 12px; font-weight: 600; color: #444; margin-bottom: 8px;
+}
+.oe-feedback-buttons {
+  display: flex; gap: 8px;
+}
+.oe-feedback-btn {
+  flex: 1; padding: 7px 10px; border: 1px solid #d0d0d0;
+  border-radius: 4px; font-size: 11px; font-weight: 600;
+  cursor: pointer; background: white; color: #333;
+  transition: background 0.15s, border-color 0.15s;
+}
+.oe-feedback-btn:hover { background: #f0f0f0; }
+.oe-fb-false-positive:hover { border-color: #b45309; color: #b45309; }
+.oe-fb-missed-threat:hover  { border-color: #a80000; color: #a80000; }
+.oe-fb-submit {
+  background: #0078d4; color: white; border-color: #0078d4;
+}
+.oe-fb-submit:hover { background: #006cbe; }
+.oe-fb-cancel {
+  background: white; color: #666;
+}
+.oe-feedback-comment {
+  width: 100%; box-sizing: border-box; padding: 8px 10px;
+  border: 1px solid #d0d0d0; border-radius: 4px;
+  font-family: "Segoe UI", sans-serif; font-size: 12px;
+  resize: vertical; margin-bottom: 8px; min-height: 48px;
+}
+.oe-feedback-comment:focus {
+  outline: none; border-color: #0078d4;
+}
+.oe-feedback-actions {
+  display: flex; gap: 8px;
+}
+.oe-feedback-success {
+  color: #107c10; text-align: center; padding: 4px 0;
+}
+.oe-feedback-error {
+  color: #a80000; text-align: center; padding: 4px 0;
 }
 
-.oe-section p {
-  margin: 0;
-  color: #333;
-  line-height: 1.5;
-  font-size: 12px;
-}
-
-.oe-section ul {
-  margin: 0;
-  padding-left: 16px;
-  color: #333;
-  line-height: 1.7;
-  font-size: 12px;
-}
-
-.oe-action {
-  background: #f0f7ff;
-  border: 1px solid #bfdbfe;
-}
-
-.oe-action h4 {
-  color: #1d4ed8;
-}
-
-.oe-action p {
-  color: #1e40af;
-  font-weight: 500;
-}
-
-/* Links section */
-.oe-links-danger {
-  border: 1px solid #ffb3b3;
-  background: #fff5f5;
-}
-
-.oe-link-row {
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 11px;
-}
-
-.oe-link-row:last-child {
-  border-bottom: none;
-}
-
-.oe-link-display {
-  color: #333;
-  word-break: break-word;
-  margin-bottom: 2px;
-}
-
-.oe-link-href {
-  color: #666;
-  word-break: break-all;
-  font-family: monospace;
-  font-size: 10px;
-}
-
-.oe-link-mismatch .oe-link-display {
-  color: #cc0000;
-  font-weight: 600;
-}
-
-.oe-link-mismatch .oe-link-href {
-  color: #cc0000;
-}
+/* ── Email ready state ───────────────────────────────────── */
+.oe-email-ready { padding: 8px 0; }
+.oe-email-ready p { font-size: 12px; color: #444; line-height: 1.5; margin-bottom: 6px; }

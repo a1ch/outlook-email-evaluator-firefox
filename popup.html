@@ -35,10 +35,7 @@
       border-bottom: 2px solid transparent;
       margin-bottom: -2px;
     }
-    .tab.active {
-      color: #0078d4;
-      border-bottom-color: #0078d4;
-    }
+    .tab.active { color: #0078d4; border-bottom-color: #0078d4; }
 
     .panel { display: none; padding: 14px; }
     .panel.active { display: block; }
@@ -69,12 +66,12 @@
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
     textarea { resize: vertical; min-height: 70px; }
     input:focus, textarea:focus { border-color: #0078d4; }
 
-    .field { margin-bottom: 4px; }
+    .field { margin-bottom: 8px; }
 
     button.save-btn {
       width: 100%;
@@ -101,76 +98,98 @@
       display: block;
     }
 
-    #status {
+    .status-msg {
       margin-top: 8px;
       padding: 7px 10px;
       border-radius: 4px;
       font-size: 12px;
       display: none;
     }
-    #status.success { background: #e6f4ea; color: #1e7e34; display: block; }
-    #status.error { background: #fff0f0; color: #cc0000; display: block; }
+    .status-msg.success { background: #e6f4ea; color: #1e7e34; display: block; }
+    .status-msg.error   { background: #fff0f0; color: #cc0000; display: block; }
 
     .how-to { font-size: 12px; color: #444; line-height: 1.8; }
     .how-to li { margin-left: 16px; }
     .how-to b { color: #0078d4; }
+
+    .config-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .config-badge.ok  { background: #e6f4ea; color: #1e7e34; }
+    .config-badge.missing { background: #fff0f0; color: #cc0000; }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>📧 Email Evaluator</h1>
-    <p>Spam & phishing detection for Outlook</p>
+    <p>Spam &amp; phishing detection for Outlook</p>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="api">API Key</button>
+    <button class="tab active" data-tab="connection">Connection</button>
     <button class="tab" data-tab="settings">Settings</button>
     <button class="tab" data-tab="help">Help</button>
   </div>
 
-  <!-- API Key Tab -->
-  <div class="panel active" id="tab-api">
+  <!-- Connection Tab -->
+  <div class="panel active" id="tab-connection">
     <div class="field">
-      <label for="apiKey">Anthropic API Key</label>
-      <input type="password" id="apiKey" placeholder="sk-ant-..." />
-      <button class="show-toggle" id="toggleShow">Show key</button>
-      <p class="hint">Get your key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+      <label for="proxyUrl">Supabase Proxy URL</label>
+      <input type="text" id="proxyUrl" placeholder="https://xxxx.supabase.co/functions/v1/analyze-email" />
+      <p class="hint">The URL of your deployed Supabase Edge Function.</p>
     </div>
-    <button class="save-btn" id="saveBtn">Save API Key</button>
-    <div id="status"></div>
+
+    <div class="field">
+      <label for="extensionToken">Extension Token</label>
+      <input type="password" id="extensionToken" placeholder="your-secret-token" />
+      <button class="show-toggle" id="toggleToken">Show token</button>
+      <p class="hint">The shared secret set on your Supabase function (<code>EXTENSION_TOKEN</code>).</p>
+    </div>
+
+    <button class="save-btn" id="saveConnection">Save &amp; Test Connection</button>
+    <div class="status-msg" id="connectionStatus"></div>
   </div>
 
   <!-- Settings Tab -->
   <div class="panel" id="tab-settings">
     <div class="field">
       <label for="tenantDomain">Your Organization Domain</label>
-      <input type="text" id="tenantDomain" placeholder="e.g. lastspikebrewery.com" />
-      <p class="hint">Used to detect external senders. Emails from outside this domain will be flagged as external.</p>
+      <input type="text" id="tenantDomain" placeholder="e.g. streamflo.com" />
+      <p class="hint">Your company’s email domain (e.g. contoso.com). Sent to the analysis server so the AI can treat SharePoint and internal senders correctly.</p>
     </div>
 
     <div class="field">
       <label for="customPrompt">Additional Instructions</label>
-      <textarea id="customPrompt" rows="3" placeholder="e.g. We frequently receive emails from AWS, flag any crypto-related content..."></textarea>
-      <p class="hint">Extra context given to the AI on every analysis. No redeploy needed.</p>
+      <textarea id="customPrompt" rows="3" placeholder="e.g. We frequently receive emails from AWS. Flag any crypto-related content..."></textarea>
+      <p class="hint">Extra context passed to the AI on every analysis.</p>
     </div>
 
     <button class="save-btn" id="saveSettings">Save Settings</button>
-    <div id="settingsStatus"></div>
+    <div class="status-msg" id="settingsStatus"></div>
   </div>
 
   <!-- Help Tab -->
   <div class="panel" id="tab-help">
     <ul class="how-to">
+      <li>Enter your <b>Proxy URL</b> and <b>Extension Token</b> in the Connection tab</li>
       <li>Open <b>outlook.cloud.microsoft</b> in Chrome</li>
       <li>Click or select an email</li>
       <li>Use the sidebar on the right</li>
       <li>Click <b>Analyze Email</b></li>
-      <li>Results show verdict, scores, and reasons</li>
     </ul>
     <br>
-    <p class="hint">Tip: Set your organization domain in <b>Settings</b> so external senders are correctly identified.</p>
+    <p class="hint">The proxy keeps your Anthropic API key secure on the server — it never touches your browser.</p>
+    <br>
+    <p class="hint">Rate limit: 1 analysis per 5 seconds.</p>
   </div>
 
+  <script src="proxy-utils.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
