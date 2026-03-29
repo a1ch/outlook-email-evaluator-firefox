@@ -1,4 +1,4 @@
-{
+﻿{
   "manifest_version": 2,
   "name": "Outlook Email Evaluator",
   "version": "2.0",
@@ -18,7 +18,7 @@
     "https://*.supabase.co/*"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["proxy-utils.js", "background.js"],
     "persistent": false
   },
   "content_scripts": [
