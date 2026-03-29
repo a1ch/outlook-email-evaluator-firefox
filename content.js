@@ -75,6 +75,7 @@ function createSidebar() {
           <button id="oe-dark-toggle" title="Toggle dark mode">🌙</button>
           <button id="oe-close">&#x27E9;</button>
         </div>
+      </div>
       <div id="oe-body"><p>Select or open an email to analyze it.</p></div>
       <button id="oe-analyze-btn">🔍 Analyze Email</button>
     </div>
