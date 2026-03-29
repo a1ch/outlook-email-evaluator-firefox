@@ -1,4 +1,4 @@
-// ── Tabs ───────────────────────────────────────────────────────────────────────
+﻿// ── Tabs ───────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
@@ -9,8 +9,9 @@ document.querySelectorAll('.tab').forEach(tab => {
 })
 
 // ── Load saved values ──────────────────────────────────────────────────────────
+const DEFAULT_PROXY_URL = 'https://pikplhvawbhndijpkdbq.supabase.co/functions/v1/analyze-email'
 chrome.storage.local.get(['proxyUrl', 'extensionToken', 'tenantDomain', 'customPrompt'], (data) => {
-  if (data.proxyUrl)       document.getElementById('proxyUrl').value       = data.proxyUrl
+  document.getElementById('proxyUrl').value       = data.proxyUrl || DEFAULT_PROXY_URL
   if (data.extensionToken) document.getElementById('extensionToken').value = data.extensionToken
   if (data.tenantDomain)   document.getElementById('tenantDomain').value   = data.tenantDomain
   if (data.customPrompt)   document.getElementById('customPrompt').value   = data.customPrompt
