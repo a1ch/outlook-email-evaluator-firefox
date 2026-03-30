@@ -361,14 +361,14 @@ async function analyzeCurrentEmail() {
   };
 
   try {
-    browser.runtime.sendMessage({ type: 'ANALYZE_EMAIL', emailData });
+    await browser.runtime.sendMessage({ type: 'ANALYZE_EMAIL', emailData });
   } catch(e) {
     showError('Extension was reloaded. Please refresh the page and try again.');
     return;
   }
 
   window._oe_timeout = setTimeout(() => {
-    showError('Timed out. Check the service worker console at chrome://extensions.');
+    showError('Timed out. Check the service worker console at about:debugging.');
   }, 20000);
   window._oe_email = email;
 }
