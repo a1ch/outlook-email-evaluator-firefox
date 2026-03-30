@@ -1,4 +1,4 @@
-﻿{
+{
   "manifest_version": 2,
   "name": "Outlook Email Evaluator",
   "version": "2.0",
@@ -18,7 +18,10 @@
     "https://*.supabase.co/*"
   ],
   "background": {
-    "scripts": ["proxy-utils.js", "background.js"],
+    "scripts": [
+      "proxy-utils.js",
+      "background.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
@@ -28,8 +31,14 @@
         "https://outlook.office.com/*",
         "https://outlook.office365.com/*"
       ],
-      "js": ["content.js"],
-      "css": ["sidebar.css", "warning.css"]
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "sidebar.css",
+        "warning.css"
+      ],
+      "run_at": "document_idle"
     }
   ],
   "browser_action": {
