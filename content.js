@@ -3,19 +3,6 @@ let sidebar = null;
 let lastEmailId = null;
 let observer = null;
 
-// --- Gift Card Fraud Detection (pre-check before API call) ---
-const GIFT_CARD_KEYWORDS = [
-  'gift card', 'gift cards', 'itunes card', 'google play card', 'amazon gift card',
-  'steam card', 'ebay gift card', 'visa gift card', 'buy gift cards', 'purchase gift cards',
-  'get gift cards', 'send gift cards', 'gift card number', 'gift card code',
-  'scratch the card', 'scratch card', 'card balance', 'redeem the card',
-  'send me the codes', 'send the codes', 'send the numbers'
-];
-
-function checkForGiftCardFraud(email) {
-  const combined = ((email.subject || '') + ' ' + (email.body || '')).toLowerCase();
-  return GIFT_CARD_KEYWORDS.some(kw => combined.includes(kw));
-}
 
 // --- XSS-safe HTML / URLs (never interpolate raw strings into innerHTML) ---
 function escapeHtml(s) {
@@ -283,12 +270,6 @@ function extractEmail() {
     });
   } catch(e) {}
 
-  const HIGH_RISK_EXTENSIONS = ['.htm','.html','.js','.vbs','.vbe','.ps1','.wsf','.wsh','.jar','.hta'];
-  const SUSPICIOUS_EXTENSIONS = ['.exe','.msi','.bat','.cmd','.iso','.img','.zip','.rar','.7z','.docm','.xlsm','.pptm','.lnk'];
-  const hasHighRiskAttachment = attachments.some(a => HIGH_RISK_EXTENSIONS.some(ext => a.endsWith(ext)));
-  const hasSuspiciousAttachment = attachments.some(a => SUSPICIOUS_EXTENSIONS.some(ext => a.endsWith(ext)));
-  const highRiskFiles = attachments.filter(a => HIGH_RISK_EXTENSIONS.some(ext => a.endsWith(ext)));
-  const suspiciousFiles = attachments.filter(a => SUSPICIOUS_EXTENSIONS.some(ext => a.endsWith(ext)));
 
   let recipient = '(No recipient found)';
   try {
@@ -304,8 +285,8 @@ function extractEmail() {
 
   const senderHasEmail = sender !== '(No sender found)' && sender.includes('@');
   return { subject, sender, senderHasEmail, recipient, body: body.slice(0, 3000), links: links.slice(0, 20), attachments, hasHighRiskAttachment, hasSuspiciousAttachment, highRiskFiles, suspiciousFiles };
-}
-
+  const senderHasEmail = sender !== '(No sender found)' && sender.includes('@');
+  return { subject, sender, senderHasEmail, recipient, body: body.slice(0, 3000), links: links.slice(0, 20), attachments };
 // --- Link Revelation ---
 function revealLinks() {
   const pane = getReadingPane();
@@ -348,27 +329,6 @@ function revealLinks() {
 async function analyzeCurrentEmail() {
   const email = extractEmail();
   setLoading();
-
-  // --- GIFT CARD FRAUD: hard pre-check, bypass API ---
-  if (checkForGiftCardFraud(email)) {
-    showResult({
-      verdict: 'PHISHING',
-      phishing_score: 99,
-      spam_score: 10,
-      summary: 'This email contains a request for gift cards. This is one of the most common fraud tactics used against businesses — it is almost certainly a scam.',
-      findings: [
-        {
-          flag: 'Gift card request detected',
-          explanation: 'Fraudsters impersonate managers, executives, or colleagues and ask employees to buy gift cards (iTunes, Google Play, Amazon, Visa, etc.) urgently. They always claim it is for a surprise, a client, or an emergency. No legitimate business request will ever ask for gift card payments — this is a well-known scam that costs businesses millions every year.',
-          howToSpotIt: 'If ANY email asks you to buy gift cards and send the codes — stop immediately. It does not matter if it appears to come from your boss or a senior executive. Call that person directly on a known phone number to verify before doing anything.'
-        }
-      ],
-      lesson: 'No legitimate business transaction is ever completed with gift cards. If someone asks you to buy gift cards and send the codes, it is a scam — 100% of the time.',
-      suggested_action: 'Do NOT purchase any gift cards. Report this email to your IT security team and your manager immediately. If you have already purchased cards, contact the card issuer right away to try to stop the transaction.'
-    }, email);
-    return;
-  }
-
   let isOutlookExternal = false;
   try {
     const paneForExternal = getReadingPane();
@@ -396,10 +356,6 @@ async function analyzeCurrentEmail() {
     body: email.body,
     links: email.links,
     attachments: email.attachments,
-    hasHighRiskAttachment: email.hasHighRiskAttachment,
-    hasSuspiciousAttachment: email.hasSuspiciousAttachment,
-    highRiskFiles: email.highRiskFiles,
-    suspiciousFiles: email.suspiciousFiles,
     isOutlookExternal: isOutlookExternal,
     clientTimestamp: new Date().toISOString(),
     clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
