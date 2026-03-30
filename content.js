@@ -285,8 +285,7 @@ function extractEmail() {
 
   const senderHasEmail = sender !== '(No sender found)' && sender.includes('@');
   return { subject, sender, senderHasEmail, recipient, body: body.slice(0, 3000), links: links.slice(0, 20), attachments, hasHighRiskAttachment, hasSuspiciousAttachment, highRiskFiles, suspiciousFiles };
-  const senderHasEmail = sender !== '(No sender found)' && sender.includes('@');
-  return { subject, sender, senderHasEmail, recipient, body: body.slice(0, 3000), links: links.slice(0, 20), attachments };
+}
 // --- Link Revelation ---
 function revealLinks() {
   const pane = getReadingPane();
