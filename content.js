@@ -1,4 +1,4 @@
-﻿// Outlook Email Evaluator - Content Script
+// Outlook Email Evaluator - Content Script
 let sidebar = null;
 let lastEmailId = null;
 let observer = null;
@@ -91,7 +91,7 @@ function createSidebar() {
 
   // Ping service worker to wake it, then analyze
   document.getElementById('oe-analyze-btn').addEventListener('click', () => {
-    try { chrome.runtime.sendMessage({ type: 'PING' }); } catch(e) {}
+    try { browser.runtime.sendMessage({ type: 'PING' }); } catch(e) {}
     setTimeout(analyzeCurrentEmail, 100);
   });
 
@@ -361,7 +361,7 @@ async function analyzeCurrentEmail() {
   };
 
   try {
-    chrome.runtime.sendMessage({ type: 'ANALYZE_EMAIL', emailData });
+    browser.runtime.sendMessage({ type: 'ANALYZE_EMAIL', emailData });
   } catch(e) {
     showError('Extension was reloaded. Please refresh the page and try again.');
     return;
@@ -531,7 +531,7 @@ function submitFeedback(feedbackType, result, email, comment) {
   `;
 
   try {
-    chrome.runtime.sendMessage({
+    browser.runtime.sendMessage({
       type: 'SUBMIT_FEEDBACK',
       payload: {
         feedbackType,
@@ -653,7 +653,7 @@ function init() {
 }
 
 // --- Message listener ---
-chrome.runtime.onMessage.addListener((message) => {
+browser.runtime.onMessage.addListener((message) => {
   if (message.type === 'ANALYSIS_DONE') {
     clearTimeout(window._oe_timeout);
     if (message.error) { showError('Analysis failed: ' + message.error); return; }
